@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Post Review</title>
+</head>
+<body>
+    <h1>Admin Login</h1>
+    <form id="loginForm">
+        <input type="password" id="adminPassword" placeholder="Enter Admin Password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="adminSection" style="display:none;">
+        <h2>Pending Posts</h2>
+        <div id="pendingPosts"></div>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const adminPass = "admin123"; // এডমিন পাসওয়ার্ড
+
+        // এডমিন লগইন
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const password = document.getElementById("adminPassword").value;
+            if (password === adminPass) {
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("adminSection").style.display = "block";
+                displayPendingPosts();
+            } else {
+                alert("Incorrect password!");
+            }
+        });
+
+        // পেন্ডিং পোস্টগুলো দেখানো
+        function displayPendingPosts() {
+            const pendingPostsDiv = document.getElementById("pendingPosts");
+            pendingPostsDiv.innerHTML = ""; // আগের পোস্টগুলো ক্লিয়ার করা
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+            posts.filter(post => post.status === 'pending').forEach(post => {
+                const postDiv = document.createElement("div");
+                postDiv.innerHTML = `
+                    <p><strong>${post.username}</strong>: ${post.content}</p>
+                    <button onclick="approvePost(${post.id})">Approve</button>
+                    <button onclick="declinePost(${post.id})">Decline</button>
+                    <hr>
+                `;
+                pendingPostsDiv.appendChild(postDiv);
+            });
+        }
+
+        // পোস্ট অ্যাপ্রুভ করা
+        function approvePost(postId) {
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.status = 'approved';
+                localStorage.setItem("posts", JSON.stringify(posts));
+                alert(`Post by ${post.username} has been approved!`);
+                displayPendingPosts();
+            }
+        }
+
+        // পোস্ট ডিক্লাইন করা
+        function declinePost(postId) {
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+            const postIndex = posts.findIndex(p => p.id === postId);
+            if (postIndex > -1) {
+                const post = posts[postIndex];
+                posts.splice(postIndex, 1);
+                localStorage.setItem("posts", JSON.stringify(posts));
+                alert(`Post by ${post.username} has been declined and removed.`);
+                displayPendingPosts();
+            }
+        }
+    </script>
+</body>
+</html>

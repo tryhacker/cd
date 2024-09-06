@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Post Submission</title>
+</head>
+<body>
+    <h1>Submit a Post</h1>
+    <form id="postForm">
+        <input type="text" id="username" placeholder="Your Name" required><br><br>
+        <textarea id="postContent" placeholder="Write your post here" required></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <p id="message"></p>
+
+    <h2>Approved Posts</h2>
+    <div id="approvedPosts"></div>
+
+    <script>
+        // পোস্ট জমা দেয়া
+        document.getElementById("postForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const postContent = document.getElementById("postContent").value;
+            const username = document.getElementById("username").value;
+
+            if (postContent.trim() === "" || username.trim() === "") {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+            const post = {
+                id: posts.length + 1,
+                username: username,
+                content: postContent,
+                status: 'pending'
+            };
+
+            posts.push(post);
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            document.getElementById("postContent").value = "";
+            document.getElementById("username").value = "";
+            document.getElementById("message").innerText = "Your post has been submitted and is awaiting admin approval.";
+
+            displayApprovedPosts();
+        });
+
+        // এপ্রুভড পোস্টগুলো দেখানো
+        function displayApprovedPosts() {
+            let posts = JSON.parse(localStorage.getItem("posts")) || [];
+            const approvedPosts = posts.filter(post => post.status === 'approved');
+            const approvedPostsDiv = document.getElementById("approvedPosts");
+
+            approvedPostsDiv.innerHTML = ""; // আগের পোস্টগুলো ক্লিয়ার করা
+
+            approvedPosts.forEach(post => {
+                const postDiv = document.createElement("div");
+                postDiv.innerHTML = `
+                    <p><strong>${post.username}</strong>: ${post.content}</p>
+                    <hr>
+                `;
+                approvedPostsDiv.appendChild(postDiv);
+            });
+        }
+
+        // পেজ লোড হওয়ার পর এপ্রুভড পোস্টগুলো দেখানো
+        window.onload = displayApprovedPosts;
+    </script>
+</body>
+</html>
