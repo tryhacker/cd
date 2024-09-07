@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .form-container {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Submit Your Information</h2>
+        <div class="form-group">
+            <label for="name">Enter Your Name:</label>
+            <input type="text" id="name" placeholder="Your Name" required />
+        </div>
+        <div class="form-group">
+            <label for="telegram">Enter Your Telegram Number:</label>
+            <input type="text" id="telegram" placeholder="Your Telegram Number" required />
+        </div>
+        <div class="form-group">
+            <label for="email">Enter Your Email:</label>
+            <input type="email" id="email" placeholder="Your Email" required />
+        </div>
+        <button onclick="submitForm()">Submit</button>
+        <p class="message" id="submission-message"></p>
+    </div>
+
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const telegram = document.getElementById('telegram').value;
+            const email = document.getElementById('email').value;
+
+            // Basic validation
+            if (name.trim() === "" || telegram.trim() === "" || email.trim() === "") {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            // Simulate sending the form data to the admin by storing it in localStorage
+            let applications = JSON.parse(localStorage.getItem('applications')) || [];
+            applications.push({
+                name: name,
+                telegram: telegram,
+                email: email
+            });
+
+            localStorage.setItem('applications', JSON.stringify(applications));
+
+            // Notify the user
+            document.getElementById('submission-message').textContent = 'Your form has been submitted!';
+            
+            // Clear form fields
+            document.getElementById('name').value = '';
+            document.getElementById('telegram').value = '';
+            document.getElementById('email').value = '';
+        }
+    </script>
+
+</body>
+</html>
+
