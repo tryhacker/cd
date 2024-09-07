@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Submission</title>
+    <title>Admission Form with Admin Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,13 +11,14 @@
             padding: 20px;
         }
 
-        .form-container {
+        .form-container, .admin-container {
             width: 400px;
             margin: 0 auto;
             padding: 20px;
             background-color: white;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -50,6 +51,10 @@
             background-color: #4cae4c;
         }
 
+        .admin-section {
+            display: none;
+        }
+
         .message {
             color: green;
             text-align: center;
@@ -60,55 +65,113 @@
 <body>
 
     <div class="form-container">
-        <h2>Submit Your Information</h2>
+        <h2>Admission Form</h2>
         <div class="form-group">
-            <label for="name">Enter Your Name:</label>
-            <input type="text" id="name" placeholder="Your Name" required />
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" placeholder="Enter your name" required />
         </div>
         <div class="form-group">
-            <label for="telegram">Enter Your Telegram Number:</label>
-            <input type="text" id="telegram" placeholder="Your Telegram Number" required />
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" placeholder="Enter your email" required />
         </div>
-        <div class="form-group">
-            <label for="email">Enter Your Email:</label>
-            <input type="email" id="email" placeholder="Your Email" required />
-        </div>
-        <button onclick="submitForm()">Submit</button>
+        <button onclick="submitForm()">Submit Form</button>
         <p class="message" id="submission-message"></p>
     </div>
 
+    <div class="form-container">
+        <h2>Admin Login</h2>
+        <div class="form-group">
+            <label for="admin-password">Enter Admin Password:</label>
+            <input type="password" id="admin-password" placeholder="Enter admin password" required />
+        </div>
+        <button onclick="checkAdmin()">Login as Admin</button>
+        <p class="message" id="admin-message"></p>
+    </div>
+
+    <div class="admin-container admin-section" id="admin-section">
+        <h2>Admin Panel</h2>
+        <div id="pending-forms"></div>
+    </div>
+
     <script>
+        // Data Store in localStorage
         function submitForm() {
             const name = document.getElementById('name').value;
-            const telegram = document.getElementById('telegram').value;
             const email = document.getElementById('email').value;
 
-            // Basic validation
-            if (name.trim() === "" || telegram.trim() === "" || email.trim() === "") {
-                alert('Please fill in all fields.');
+            if (name.trim() === "" || email.trim() === "") {
+                alert('Please fill out all fields.');
                 return;
             }
 
-            // Simulate sending the form data to the admin by storing it in localStorage
-            let applications = JSON.parse(localStorage.getItem('applications')) || [];
-            applications.push({
+            // Store form in localStorage
+            let forms = JSON.parse(localStorage.getItem('forms')) || [];
+            forms.push({
                 name: name,
-                telegram: telegram,
-                email: email
+                email: email,
+                status: 'pending'
             });
 
-            localStorage.setItem('applications', JSON.stringify(applications));
+            localStorage.setItem('forms', JSON.stringify(forms));
 
-            // Notify the user
-            document.getElementById('submission-message').textContent = 'Your form has been submitted!';
+            // Show message
+            document.getElementById('submission-message').textContent = 'Form submitted!';
             
-            // Clear form fields
+            // Clear form
             document.getElementById('name').value = '';
-            document.getElementById('telegram').value = '';
             document.getElementById('email').value = '';
+        }
+
+        // Admin Login Check
+        function checkAdmin() {
+            const password = document.getElementById('admin-password').value;
+            if (password === 'rusho123') {
+                document.getElementById('admin-section').style.display = 'block';
+                document.getElementById('admin-message').textContent = '';
+                loadPendingForms();
+            } else {
+                document.getElementById('admin-message').textContent = 'Incorrect password!';
+            }
+        }
+
+        // Load pending forms for admin to review
+        function loadPendingForms() {
+            let forms = JSON.parse(localStorage.getItem('forms')) || [];
+            const pendingFormsContainer = document.getElementById('pending-forms');
+            pendingFormsContainer.innerHTML = '';
+
+            forms.forEach((form, index) => {
+                if (form.status === 'pending') {
+                    let formEntry = document.createElement('div');
+                    formEntry.innerHTML = `
+                        <p><strong>Name:</strong> ${form.name}</p>
+                        <p><strong>Email:</strong> ${form.email}</p>
+                        <button onclick="approveForm(${index})">Approve</button>
+                        <button onclick="declineForm(${index})">Decline</button>
+                        <hr>
+                    `;
+                    pendingFormsContainer.appendChild(formEntry);
+                }
+            });
+        }
+
+        // Approve form
+        function approveForm(index) {
+            let forms = JSON.parse(localStorage.getItem('forms'));
+            forms[index].status = 'approved';
+            localStorage.setItem('forms', JSON.stringify(forms));
+            alert('Successful added your form.');
+            loadPendingForms();
+        }
+
+        // Decline form
+        function declineForm(index) {
+            let forms = JSON.parse(localStorage.getItem('forms'));
+            forms[index].status = 'declined';
+            localStorage.setItem('forms', JSON.stringify(forms));
+            loadPendingForms();
         }
     </script>
 
 </body>
 </html>
-
