@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .admin-panel {
+            width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-entry {
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .form-entry p {
+            margin: 5px 0;
+        }
+
+        button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button.decline {
+            background-color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h2>Submitted Applications</h2>
+        <div id="applications-list"></div>
+    </div>
+
+    <script>
+        function loadApplications() {
+            const applications = JSON.parse(localStorage.getItem('applications')) || [];
+            const applicationsList = document.getElementById('applications-list');
+
+            applicationsList.innerHTML = '';
+
+            applications.forEach((application, index) => {
+                const formEntry = document.createElement('div');
+                formEntry.classList.add('form-entry');
+
+                formEntry.innerHTML = `
+                    <p><strong>Name:</strong> ${application.name}</p>
+                    <p><strong>Telegram:</strong> ${application.telegram}</p>
+                    <p><strong>Email:</strong> ${application.email}</p>
+                    <button onclick="approveApplication(${index})">Approve</button>
+                    <button class="decline" onclick="declineApplication(${index})">Decline</button>
+                `;
+
+                applicationsList.appendChild(formEntry);
+            });
+        }
+
+        // Approve application
+        function approveApplication(index) {
+            alert('Application approved!');
+            removeApplication(index);
+        }
+
+        // Decline application
+        function declineApplication(index) {
+            alert('Application declined.');
+            removeApplication(index);
+        }
+
+        // Remove application from the list
+        function removeApplication(index) {
+            let applications = JSON.parse(localStorage.getItem('applications'));
+            applications.splice(index, 1);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            loadApplications();  // Refresh the list
+        }
+
+        // Load applications when the page is loaded
+        window.onload = loadApplications;
+    </script>
+
+</body>
+</html>
